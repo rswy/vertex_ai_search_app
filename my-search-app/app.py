@@ -28,13 +28,15 @@ def search():
 
     results = []
     for result in response:
+        doc = result.document
         results.append({
-            "title": result.document.title if result.document.title else "Untitled",
-            "snippet": result.document.snippet if result.document.snippet else "",
-            "uri": result.document.uri if result.document.uri else "#"
+            "title": doc.struct_data.get("title", "Untitled") if doc.struct_data else "Untitled",
+            "snippet": doc.struct_data.get("snippet", "") if doc.struct_data else "",
+            "uri": doc.struct_data.get("uri", "#") if doc.struct_data else "#"
         })
 
     return jsonify(results)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
