@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Vertex AI Widget (JWT Secured)</title>
@@ -30,5 +30,110 @@
       setInterval(setAuthToken, 55 * 60 * 1000);
     </script>
 
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Vertex AI Search POC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Google widget bundle -->
+  <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Vertex AI Search POC</h1>
+
+    <!-- ========== WIDGET MODE (JWT secured) ========== -->
+    <section>
+      <h2>Widget Mode</h2>
+
+      <!-- Hidden widget element -->
+      <gen-search-widget
+        configId="{{ widget_config_id }}"
+        triggerId="searchWidgetTrigger">
+      </gen-search-widget>
+
+      <!-- Trigger element -->
+      <input placeholder="Search here (widget)" id="searchWidgetTrigger" />
+
+      <p class="note">
+        The widget requires your domain to be added to the app’s Authorized Domains list in GCP.
+      </p>
+    </section>
+
+    <hr/>
+
+    <!-- ========== API MODE (direct backend call) ========== -->
+    <section>
+      <h2>API Mode</h2>
+      <div class="search-row">
+        <input id="apiSearchBox" type="text" placeholder="Type and press Enter for API mode" />
+        <button onclick="performApiSearch()">Go</button>
+      </div>
+      <div id="results"></div>
+    </section>
+  </div>
+
+  <script>
+    // ----- JWT for widget -----
+
+    async function refreshToken() {
+      try {
+        const response = await fetch("/token");
+        const data = await response.json();
+        const searchWidget = document.querySelector("gen-search-widget");
+        searchWidget.authToken = data.token;
+      } catch (e) {
+        console.error("Failed to fetch JWT:", e);
+      }
+     
+    }
+
+    // Refresh immediately and every 55 minutes
+    refreshToken();
+    setInterval(refreshToken, 55 * 60 * 1000); // 55 min
+
+    
+
+    // ----- API mode search -----
+    async function performApiSearch() {
+      const query = document.getElementById("apiSearchBox").value;
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "Searching...";
+
+      try {
+        const resp = await fetch("/api_search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+        const data = await resp.json();
+
+        if (!Array.isArray(data)) {
+          resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+          return;
+        }
+        resultsDiv.innerHTML = data.map(r => `
+          <div class="result">
+            <a href="${r.uri}" target="_blank">${r.title}</a>
+            <p>${r.snippet || ""}</p>
+          </div>
+        `).join("");
+      } catch (e) {
+        resultsDiv.innerHTML = "Search failed. See console.";
+        console.error(e);
+      }
+    }
+
+    // Enter to search in API mode
+    document.getElementById("apiSearchBox").addEventListener("keyup", (e) => {
+      if (e.key === "Enter") performApiSearch();
+    });
+  </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-body {
+/* body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
   text-align: center;
@@ -31,4 +31,16 @@ button {
   margin-top: 20px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
-}
+} */
+
+
+body { font-family: system-ui, Arial, sans-serif; background:#f6f7f9; }
+.container { max-width: 900px; margin: 40px auto; background:#fff; padding:24px 28px; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,.08); }
+h1 { text-align:center; margin-top:0; }
+h2 { margin-bottom:8px; }
+.search-row { display:flex; gap:8px; }
+.search-row input { flex:1; padding:10px 12px; font-size:16px; }
+.search-row button { padding:10px 16px; font-size:16px; border-radius:10px; border:1px solid #ddd; cursor:pointer; }
+.result { padding:10px 0; border-bottom:1px solid #eee; }
+.result a { font-weight:600; }
+.note { color:#666; font-size:13px; }
