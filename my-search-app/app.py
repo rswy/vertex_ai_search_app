@@ -1,15 +1,56 @@
 from flask import Flask, render_template, request, jsonify
 from google.cloud import discoveryengine_v1
 
+import datetime
+import jwt  # PyJWT
+from flask import Flask, render_template, jsonify
+import os
+import json
+
 app = Flask(__name__)
 
-PROJECT_ID = "uobsearchhtool"
-LOCATION = "global"  # or your Vertex AI Search region
-SEARCH_ENGINE_ID = "uob-store_1748309184589"
+
+# Load from environment variable path
+cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if not cred_path:
+    raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS not set!")
+
+with open(cred_path) as f:
+    service_account_info = json.load(f)
+
+SERVICE_ACCOUNT_EMAIL = service_account_info["client_email"]
+PRIVATE_KEY = service_account_info["private_key"]
+
+
+def generate_jwt():
+    issued_at = datetime.datetime.utcnow()
+    expiration_time = issued_at + datetime.timedelta(minutes=60)  # 1 hour token
+    payload = {
+        "iss": SERVICE_ACCOUNT_EMAIL,      # service account email
+        "sub": SERVICE_ACCOUNT_EMAIL,
+        "aud": "https://gen-app-builder.googleapis.com/",  # audience for Vertex AI
+        "iat": issued_at,
+        "exp": expiration_time,
+    }
+
+    token = jwt.encode(payload, PRIVATE_KEY, algorithm="RS256")
+    return token
+
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+@app.route("/token")
+def token():
+    return jsonify({"token": generate_jwt()})
+
+
+
+PROJECT_ID = "uobsearchhtool"
+LOCATION = "global"  # or your Vertex AI Search region
+SEARCH_ENGINE_ID = "uob-store_1748309184589"
 
 @app.route("/search", methods=["POST"])
 def search():
