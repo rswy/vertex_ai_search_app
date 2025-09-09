@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Search (Vertex AI Widget POC)</title>
+</head>
+<body>
+    <h2>Search (Vertex AI Widget POC)</h2>
+
+    <!-- Widget JavaScript bundle -->
+    <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
+
+    <!-- Search widget element (hidden by default) -->
+    <gen-search-widget
+      configId="6491b2ed-bc2f-4186-ba55-2c73421f7e45"
+      triggerId="searchWidgetTrigger">
+    </gen-search-widget>
+
+    <!-- Trigger input (clicking it opens the widget) -->
+    <input placeholder="Search here" id="searchWidgetTrigger" />
+
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
   <title>Vertex AI Search POC</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script>
@@ -24,6 +47,11 @@
     }
   </script>
 </head>
+
+
+<script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
+ 
+
 <body>
   <div class="container">
     <h1>Search (Vertex AI POC)</h1>
@@ -33,4 +61,11 @@
     <div id="results"></div>
   </div>
 </body>
-</html>
+
+
+
+
+
+
+
+</html> -->

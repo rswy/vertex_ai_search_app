@@ -35,7 +35,8 @@ def search():
             "uri": doc.struct_data.get("uri", "#") if doc.struct_data else "#"
         })
 
-    return jsonify(results)
+    return render_template("index.html", results=results)
+    # return jsonify(results)
 
 
 if __name__ == "__main__":
