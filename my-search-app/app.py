@@ -122,7 +122,6 @@ with open(CREDENTIALS_PATH, "r", encoding="utf-8") as f:
 
 SERVICE_ACCOUNT_EMAIL = service_account_info["client_email"]
 PRIVATE_KEY = service_account_info["private_key"]
-
 # --- Helpers ---
 def generate_jwt():
     """
@@ -133,7 +132,7 @@ def generate_jwt():
     # issued_at = datetime.datetime.utcnow()
     # exp = issued_at + datetime.timedelta(minutes=60)  # expires in 60 min
     issued_at = datetime.now(timezone.utc)
-    exp = issued_at + timedelta(hours=1)
+    exp = issued_at + timedelta(minutes=59)
 
     
     payload = {
@@ -144,6 +143,7 @@ def generate_jwt():
         "exp": int(exp.timestamp()),
     }
     token = jwt.encode(payload, PRIVATE_KEY, algorithm="RS256")
+    print(f"\n\nJWT Token!!!!:\n{token}\n\n")
     # PyJWT returns str in new versions; ensure string
     return token if isinstance(token, str) else token.decode("utf-8")
 
@@ -173,34 +173,81 @@ def api_search():
         return jsonify({"error": "Missing query"}), 400
 
     client = discoveryengine_v1.SearchServiceClient()
+    # req = discoveryengine_v1.SearchRequest(
+    #     serving_config=serving_config_path(),
+    #     query=query,
+    #     page_size=5,
+    # )
+
+    
     req = discoveryengine_v1.SearchRequest(
         serving_config=serving_config_path(),
         query=query,
-        page_size=5,
+        page_size=10,
+        query_expansion_spec={"condition": "AUTO"},
+        content_search_spec={
+            "summary_spec": {"summary_result_count": 5}  # ask for summary too
+        },
     )
 
     response = client.search(request=req)
+
     results = []
     for result in response:
         doc = result.document
-        # Be defensive across doc formats
-        # Try derived_struct_data -> struct_data -> individual fields
         derived = getattr(doc, "derived_struct_data", None)
-        struct   = getattr(doc, "struct_data", None)
 
-        def get_field(obj, key, default=None):
-            try:
-                return obj.get(key, default) if obj else default
-            except Exception:
-                return default
+        title = "Untitled"
+        uri = "#"
+        snippet = ""
 
-        title   = get_field(derived, "title") or get_field(struct, "title") or getattr(doc, "title", None) or "Untitled"
-        snippet = get_field(derived, "snippet") or get_field(struct, "snippet") or ""
-        uri     = get_field(derived, "uri") or get_field(struct, "uri") or getattr(doc, "uri", None) or "#"
+        # pull from derived_struct_data if present
+        if derived:
+            title = derived.get("title", title)
+            uri = derived.get("link", uri) or derived.get("uri", uri)
 
-        results.append({"title": title, "snippet": snippet, "uri": uri})
+        # prefer result.snippet, fallback to struct_data
+        if hasattr(result, "snippet"):
+            snippet = result.snippet
+        elif doc.struct_data:
+            snippet = doc.struct_data.get("snippet", "")
 
-    return jsonify(results)
+        results.append({
+            "title": title,
+            "snippet": snippet,
+            "uri": uri
+        })
+
+    # grab summary if Vertex AI Search generated one
+    summary_text = None
+    if response.summary and response.summary.summary_text:
+        summary_text = response.summary.summary_text
+
+    return jsonify({
+        "results": results,
+        "summary": summary_text
+    })
+    # results = []
+    # for result in response:
+    #     doc = result.document
+    #     # Be defensive across doc formats
+    #     # Try derived_struct_data -> struct_data -> individual fields
+    #     derived = getattr(doc, "derived_struct_data", None)
+    #     struct   = getattr(doc, "struct_data", None)
+
+    #     def get_field(obj, key, default=None):
+    #         try:
+    #             return obj.get(key, default) if obj else default
+    #         except Exception:
+    #             return default
+
+    #     title   = get_field(derived, "title") or get_field(struct, "title") or getattr(doc, "title", None) or "Untitled"
+    #     snippet = get_field(derived, "snippet") or get_field(struct, "snippet") or ""
+    #     uri     = get_field(derived, "uri") or get_field(struct, "uri") or getattr(doc, "uri", None) or "#"
+
+    #     results.append({"title": title, "snippet": snippet, "uri": uri})
+
+    # return jsonify(results)
 
 if __name__ == "__main__":
     # Local dev server (use gunicorn in production)

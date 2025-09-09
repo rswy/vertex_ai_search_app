@@ -98,7 +98,7 @@
     refreshToken();
     setInterval(refreshToken, 55 * 60 * 1000); // 55 min
 
-    
+
 
     // ----- API mode search -----
     async function performApiSearch() {
@@ -114,16 +114,21 @@
         });
         const data = await resp.json();
 
-        if (!Array.isArray(data)) {
-          resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-          return;
+        if (data.summary) {
+          resultsDiv.innerHTML = `<div class="summary"><strong>Summary:</strong> ${data.summary}</div>`;
         }
-        resultsDiv.innerHTML = data.map(r => `
-          <div class="result">
-            <a href="${r.uri}" target="_blank">${r.title}</a>
-            <p>${r.snippet || ""}</p>
-          </div>
-        `).join("");
+
+        // if (!Array.isArray(data)) {
+        //   resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        //   return;
+        // }
+        // resultsDiv.innerHTML = data.map(r => `
+        //   <div class="result">
+        //     <a href="${r.uri}" target="_blank">${r.title}</a>
+        //     <p>${r.snippet || ""}</p>
+        //   </div>
+        // `).join("");
+        
       } catch (e) {
         resultsDiv.innerHTML = "Search failed. See console.";
         console.error(e);
