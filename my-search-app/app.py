@@ -3,9 +3,9 @@ from google.cloud import discoveryengine_v1
 
 app = Flask(__name__)
 
-PROJECT_ID = "your-gcp-project-id"
+PROJECT_ID = "uobsearchhtool"
 LOCATION = "global"  # or your Vertex AI Search region
-SEARCH_ENGINE_ID = "your-search-engine-id"
+SEARCH_ENGINE_ID = "uob-store_1748309184589"
 
 @app.route("/")
 def home():
