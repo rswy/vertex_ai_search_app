@@ -1,88 +1,107 @@
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vertex AI Widget (JWT Secured)</title>
-    <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
-</head>
-<body>
-    <h2>Vertex AI Search Widget (JWT Secured)</h2>
-
-    <gen-search-widget
-      configId="6491b2ed-bc2f-4186-ba55-2c73421f7e45"
-      triggerId="searchWidgetTrigger">
-    </gen-search-widget>
-
-    <input placeholder="Search here" id="searchWidgetTrigger" />
-
-    <script>
-      async function setAuthToken() {
-        const res = await fetch("/token");
-        const data = await res.json();
-        const searchWidget = document.querySelector('gen-search-widget');
-        searchWidget.authToken = data.token;
-      }
-
-      // Set token immediately when page loads
-      setAuthToken();
-
-      // Refresh every 55 minutes (token expires in 60 min)
-      setInterval(setAuthToken, 55 * 60 * 1000);
-    </script>
-
-</body>
-</html>
-
-
-
-
-<!-- <!DOCTYPE html>
-<html>
-<head>
+  <meta charset="utf-8" />
   <title>Vertex AI Search POC</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <script>
-    async function performSearch() {
-      const query = document.getElementById("searchBox").value;
-      const response = await fetch("/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query })
-      });
-      const results = await response.json();
-
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = "";
-      results.forEach(r => {
-        resultsDiv.innerHTML += `<div class="result">
-          <a href="${r.uri}" target="_blank"><h3>${r.title}</h3></a>
-          <p>${r.snippet}</p>
-        </div>`;
-      });
-    }
-  </script>
+  <!-- Google widget bundle -->
+  <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
 </head>
-
-
-<script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
- 
-
 <body>
   <div class="container">
-    <h1>Search (Vertex AI POC)</h1>
-    <input id="searchBox" type="text" placeholder="Search..." 
-           onkeyup="if(event.key==='Enter') performSearch()">
-    <button onclick="performSearch()">Go</button>
-    <div id="results"></div>
+    <h1>Vertex AI Search POC</h1>
+
+    <!-- ========== WIDGET MODE (JWT secured) ========== -->
+    <section>
+      <h2>Widget Mode</h2>
+
+      <!-- Hidden widget element -->
+      <gen-search-widget
+        configId="{{ widget_config_id }}"
+        triggerId="searchWidgetTrigger">
+      </gen-search-widget>
+
+      <!-- Trigger element -->
+      <input placeholder="Search here (widget)" id="searchWidgetTrigger" />
+
+      <p class="note">
+        The widget requires your domain to be added to the app’s Authorized Domains list in GCP.
+      </p>
+    </section>
+
+    <hr/>
+
+    <!-- ========== API MODE (direct backend call) ========== -->
+    <section>
+      <h2>API Mode</h2>
+      <div class="search-row">
+        <input id="apiSearchBox" type="text" placeholder="Type and press Enter for API mode" />
+        <button onclick="performApiSearch()">Go</button>
+      </div>
+      <div id="results"></div>
+    </section>
   </div>
+
+  <script>
+    // ----- JWT for widget -----
+
+    // async function refreshToken() {
+    //   try {
+    //     const response = await fetch("/token");
+    //     const data = await response.json();
+    //     const searchWidget = document.querySelector("gen-search-widget");
+    //     searchWidget.authToken = data.token;
+    //   } catch (e) {
+    //     console.error("Failed to fetch JWT:", e);
+    //   }
+     
+    // }
+
+    // // Refresh immediately and every 55 minutes
+    // refreshToken();
+    // setInterval(refreshToken, 55 * 60 * 1000); // 55 min
+
+
+
+    // ----- API mode search -----
+    async function performApiSearch() {
+      const query = document.getElementById("apiSearchBox").value;
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "Searching...";
+
+      try {
+        const resp = await fetch("/api_search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+        const data = await resp.json();
+
+        if (data.summary) {
+          resultsDiv.innerHTML = `<div class="summary"><strong>Summary:</strong> ${data.summary}</div>`;
+        }
+
+        if (Array.isArray(data.results) && data.results.length > 0) {
+          resultsDiv.innerHTML += data.results.map(r => `
+            <div class="result">
+              <a href="${r.uri}" target="_blank">${r.title}</a>
+              <p>${r.snippet || ""}</p>
+            </div>
+          `).join("");
+        } else {
+          resultsDiv.innerHTML += "<div>No results found.</div>";
+        }
+
+      } catch (e) {
+        resultsDiv.innerHTML = "Search failed. See console.";
+        console.error(e);
+      }
+    }
+
+    // Enter to search in API mode
+    document.getElementById("apiSearchBox").addEventListener("keyup", (e) => {
+      if (e.key === "Enter") performApiSearch();
+    });
+  </script>
 </body>
-
-
-
-
-
-
-
-</html> -->
+</html>

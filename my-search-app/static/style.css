@@ -34,7 +34,7 @@ button {
 } */
 
 
-body { font-family: system-ui, Arial, sans-serif; background:#f6f7f9; }
+/* body { font-family: system-ui, Arial, sans-serif; background:#f6f7f9; }
 .container { max-width: 900px; margin: 40px auto; background:#fff; padding:24px 28px; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,.08); }
 h1 { text-align:center; margin-top:0; }
 h2 { margin-bottom:8px; }
@@ -43,4 +43,160 @@ h2 { margin-bottom:8px; }
 .search-row button { padding:10px 16px; font-size:16px; border-radius:10px; border:1px solid #ddd; cursor:pointer; }
 .result { padding:10px 0; border-bottom:1px solid #eee; }
 .result a { font-weight:600; }
-.note { color:#666; font-size:13px; }
+.note { color:#666; font-size:13px; } */
+
+
+/* General Body Styles */
+ 
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.uob-header {
+    background-color: #fff;
+    padding: 20px 0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.uob-header .container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 40px;
+    margin-right: 40px;
+}
+
+nav {
+    flex-grow: 1;
+}
+
+nav a {
+    color: #0033a0;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.header-right {
+    color: #d71e28;
+    font-weight: bold;
+}
+
+/* Hero Section */
+.hero {
+    background-image: url('https://www.uobgroup.com/uobgroup/assets/images/home-banner-1.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 40px;
+    color: #002d62; /* Changed to a dark blue color */
+}
+
+/* UOB Search Bar */
+.top-search-bar {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.search-bar-input .input-group {
+    display: flex;
+    width: 100%;
+}
+
+.top-search-input {
+    flex: 1;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 4px 0 0 4px;
+    color: #333; /* Changed to a dark color for readability */
+}
+
+.top-search-input:focus {
+    outline: none;
+}
+
+.btn-search-go {
+    background-color: #d71e28;
+    border: none;
+    padding: 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.btn-search-go img {
+    height: 20px;
+}
+
+
+/* Results Section */
+.results-section {
+    padding: 40px 0;
+}
+
+#results {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.result {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.result:last-child {
+    border-bottom: none;
+}
+
+.result a {
+    color: #0033a0;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.result p {
+    color: #666;
+    margin-top: 5px;
+}
+
+.summary {
+    background-color: #eef5ff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* Footer */
+.uob-footer {
+    background-color: #002d62;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}

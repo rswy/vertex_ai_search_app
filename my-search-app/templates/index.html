@@ -2,49 +2,65 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Vertex AI Search POC</title>
+  <title>Vertex AI Search POC - UOB Style</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <!-- Google widget bundle -->
   <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Vertex AI Search POC</h1>
+  <header class="uob-header">
+    <div class="container">
+        <img src="https://www.uobgroup.com/uobgroup/assets/images/logo-uob.svg" alt="UOB Logo" class="logo">
+        <nav>
+            <a href="#">For Individuals</a>
+            <a href="#">For Companies</a>
+            <a href="#">About UOB</a>
+        </nav>
+        <div class="header-right">
+            <span>Login</span>
+        </div>
+    </div>
+  </header>
 
-    <!-- ========== WIDGET MODE (JWT secured) ========== -->
-    <section>
-      <h2>Widget Mode</h2>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>How can we help you today?</h1>
+        <div class="search-container">
+            <div class="search-section">
+              <h2>Widget Mode</h2>
+              <gen-search-widget
+                configId="{{ widget_config_id }}"
+                triggerId="searchWidgetTrigger">
+              </gen-search-widget>
+              <input placeholder="Search with Widget" id="searchWidgetTrigger" class="search-box" />
+            </div>
 
-      <!-- Hidden widget element -->
-      <gen-search-widget
-        configId="{{ widget_config_id }}"
-        triggerId="searchWidgetTrigger">
-      </gen-search-widget>
-
-      <!-- Trigger element -->
-      <input placeholder="Search here (widget)" id="searchWidgetTrigger" />
-
-      <p class="note">
-        The widget requires your domain to be added to the app’s Authorized Domains list in GCP.
-      </p>
-    </section>
-
-    <hr/>
-
-    <!-- ========== API MODE (direct backend call) ========== -->
-    <section>
-      <h2>API Mode</h2>
-      <div class="search-row">
-        <input id="apiSearchBox" type="text" placeholder="Type and press Enter for API mode" />
-        <button onclick="performApiSearch()">Go</button>
+            <div class="search-section">
+              <h2>API Mode</h2>
+              <div class="search-row">
+                <input id="apiSearchBox" type="text" placeholder="Search with API" class="search-box" />
+                <button onclick="performApiSearch()">Go</button>
+              </div>
+            </div>
+        </div>
       </div>
-      <div id="results"></div>
     </section>
-  </div>
+
+    <section class="results-section">
+        <div class="container">
+            <div id="results"></div>
+        </div>
+    </section>
+  </main>
+
+  <footer class="uob-footer">
+      <div class="container">
+          <p>&copy; 2024 United Overseas Bank Limited Co. All Rights Reserved.</p>
+      </div>
+  </footer>
 
   <script>
     // ----- JWT for widget -----
-
     // async function refreshToken() {
     //   try {
     //     const response = await fetch("/token");
@@ -54,14 +70,9 @@
     //   } catch (e) {
     //     console.error("Failed to fetch JWT:", e);
     //   }
-     
     // }
-
-    // // Refresh immediately and every 55 minutes
     // refreshToken();
-    // setInterval(refreshToken, 55 * 60 * 1000); // 55 min
-
-
+    // setInterval(refreshToken, 55 * 60 * 1000);
 
     // ----- API mode search -----
     async function performApiSearch() {
@@ -79,6 +90,8 @@
 
         if (data.summary) {
           resultsDiv.innerHTML = `<div class="summary"><strong>Summary:</strong> ${data.summary}</div>`;
+        } else {
+            resultsDiv.innerHTML = "";
         }
 
         if (Array.isArray(data.results) && data.results.length > 0) {
@@ -98,7 +111,6 @@
       }
     }
 
-    // Enter to search in API mode
     document.getElementById("apiSearchBox").addEventListener("keyup", (e) => {
       if (e.key === "Enter") performApiSearch();
     });
